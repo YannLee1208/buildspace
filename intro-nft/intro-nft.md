@@ -61,3 +61,92 @@ contract MyEpicNFT is ERC721URIStorage {
 }
 ```
 
+**add tokenURI**
+
+> The `tokenURI` is where the actual NFT data lives. And it usually **links** to a JSON file called the `metadata` that looks something like this:
+>
+> ```bash
+> {
+>     "name": "Spongebob Cowboy Pants",
+>     "description": "A silent hero. A watchful protector.",
+>     "image": "https://i.imgur.com/v7U019j.png"
+> }
+> ```
+>
+> We can copy the `Spongebob Cowboy Pants` JSON metadata above and paste it into [this](https://jsonkeeper.com/?utm_source=buildspace.so&utm_medium=buildspace_project) website. This website is just an easy place for people to host JSON data
+>
+> For me, I push tokenURI json file in GitHub https://github.com/YannLee1208/buildspace/blob/master/resources/1.json
+
+`_setTokenURI(newItemId, "https://github.com/YannLee1208/buildspace/blob/master/resources/1.json");`
+
+
+
+**deploy**
+
+```js
+const main = async () => {
+  const nftContractFactory = await hre.ethers.getContractFactory('MyEpicNFT');
+  const nftContract = await nftContractFactory.deploy();
+  await nftContract.deployed();
+  console.log("Contract deployed to:", nftContract.address);
+
+  // Call the function.
+  let txn = await nftContract.makeAnEpicNFT()
+  // Wait for it to be mined.
+  await txn.wait()
+
+  // Mint another NFT for fun.
+  txn = await nftContract.makeAnEpicNFT()
+  // Wait for it to be mined.
+  await txn.wait()
+
+};
+
+const runMain = async () => {
+  try {
+    await main();
+    process.exit(0);
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
+  }
+};
+
+runMain();
+```
+
+==every time someone mints an NFT with this function, it's always the same NFT==
+
+
+
+##  Deploy to Rinkeby and see on OpenSea
+
+==what's transaction==
+
+When we want to perform an action that changes the blockchain we call it a *transaction*
+
+* sending someone ETH 
+* updates a variable in our contract
+* Minting an NFT is a transaction because we're saving data on the contract.
+
+==deploy to rinkeby==
+
+> use QuickNode  + Rinkeby
+
+set `hardhat.config.js`
+
+```js
+require('@nomiclabs/hardhat-waffle');
+require("dotenv").config({ path: ".env" });
+
+module.exports = {
+  solidity: '0.8.1',
+  networks: {
+    rinkeby: {
+      url: process.env.QUICKNODE_API_KEY_URL,
+      accounts: [process.env.RINKEBY_PRIVATE_KEY],
+    },
+  },
+};
+```
+
